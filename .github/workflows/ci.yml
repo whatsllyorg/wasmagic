@@ -76,6 +76,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v2
 
