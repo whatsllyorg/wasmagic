@@ -3,6 +3,10 @@
   "version": "0.0.0-dev",
   "description": "WASM compiled version of libmagic",
   "repository": "git://github.com/whatsllyorg/wasmagic.git",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "keywords": [
     "magic",
     "libmagic",
