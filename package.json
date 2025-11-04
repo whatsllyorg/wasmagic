@@ -1,11 +1,8 @@
 {
-  "name": "@whatsllyorg/wasmagic",
+  "name": "@tuvisorg/wasmagic",
   "version": "0.0.0-dev",
   "description": "WASM compiled version of libmagic",
   "repository": "git://github.com/whatsllyorg/wasmagic.git",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "keywords": [
     "magic",
     "libmagic",
