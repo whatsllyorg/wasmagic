@@ -61,6 +61,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
+          registry-url: 'https://registry.npmjs.org/'
+          scope: '@tuvisorg'
 
       - name: Install dependencies
         run: npm install glob@"$(jq -r .devDependencies.glob package.json)" jest@"$(jq -r .devDependencies.jest package.json)"
@@ -75,24 +77,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     permissions:
+      id-token: write
       contents: write
-      packages: write
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Set variables
-        run: |
-          NODE_VERSION="$(< .nvmrc)"
-          echo "NODE_VERSION=$NODE_VERSION" >> $GITHUB_ENV
-
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@whatsllyorg'
 
       - name: Cache build artifacts
         uses: actions/cache@v4
@@ -100,38 +88,7 @@ jobs:
           path: dist
           key: cache-build-artifacts-${{ github.sha }}
 
-      - name: Determine version
-        id: version
-        run: |
-          # Get the latest tag
-          git fetch --tags
-          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          VERSION=${LATEST_TAG#v}
-          
-          # Increment patch version
-          IFS='.' read -r -a parts <<< "$VERSION"
-          MAJOR=${parts[0]}
-          MINOR=${parts[1]}
-          PATCH=$((${parts[2]} + 1))
-          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-          
-          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-          echo "New version will be: $NEW_VERSION"
-
-      - name: Update package version
-        run: |
-          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
-
-      - name: Publish to GitHub Packages
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create and push tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
-          git push origin "v${{ steps.version.outputs.version }}"
+      - name: Publish
+        uses: moshen/merge-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
