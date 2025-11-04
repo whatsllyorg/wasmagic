@@ -65,7 +65,7 @@ export enum WASMagicFlags {
 }
 
 type ModuleOptions = {
-    locateFile?: (path: string, prefix: string) => string;
+  locateFile?: (path: string, prefix: string) => string;
 };
 
 export type WASMagicOptions = {
